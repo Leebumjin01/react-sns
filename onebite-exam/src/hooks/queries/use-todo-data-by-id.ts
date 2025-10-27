@@ -1,10 +1,11 @@
 import { fetchTodoById } from "@/api/fetch-todo-by-id";
+import { QUERY_KEYS } from "@/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 
 export function useTodoDataById(id: string) {
   return useQuery({
     queryFn: () => fetchTodoById(id),
-    queryKey: ["todos", id],
+    queryKey: QUERY_KEYS.todo.detail(id),
 
     staleTime: 5000, // 지정한 시간 동안 데이터를 최신 상태로 간주
     // refetchInterval: 1000, // 지정한 밀리초(ms) 간격으로 데이터를 자동으로 재요청(refetch)
