@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // server state와 관련된 store라 생각하면 됨?
 const queryClient = new QueryClient();
@@ -12,6 +13,7 @@ createRoot(document.getElementById("root")!).render(
   // <StrictMode>
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools />
       <App />
     </QueryClientProvider>
   </BrowserRouter>
