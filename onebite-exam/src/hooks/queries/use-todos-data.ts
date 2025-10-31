@@ -1,11 +1,21 @@
 import { fetchTodos } from "@/api/fetch-todos";
 import { QUERY_KEYS } from "@/lib/constants";
-import { useQuery } from "@tanstack/react-query";
+import type { Todo } from "@/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useTodosData() {
+  const queryClient = useQueryClient();
+
   return useQuery({
-    queryFn: fetchTodos, // 컴포넌트가 렌더링 될 때 fetch useEffect(()=>{fetchTodos()},[]) 랑 비슷한 맥락
+    queryFn: async () => {
+      const todos = await fetchTodos();
+
+      todos.forEach((todo) => {
+        queryClient.setQueryData<Todo>(QUERY_KEYS.todo.detail(todo.id), todo);
+      });
+
+      return todos.map((todo) => todo.id);
+    },
     queryKey: QUERY_KEYS.todo.list,
-    retry: 0, // 요청 실패 시 재시도 횟수
   });
 }

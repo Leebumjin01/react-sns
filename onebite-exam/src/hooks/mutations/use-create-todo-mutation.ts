@@ -16,10 +16,17 @@ export function useCreateTodoMutation() {
     //   });
     // }, // 요청 성공시 invalidateQueries를 사용해서 stale 상태로 만들면, 리액트 쿼리가 자동 fetch
     onSuccess: (newTodo) => {
-      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (prevTodos) => {
-        if (!prevTodos) return [newTodo];
-        return [...prevTodos, newTodo];
-      });
+      queryClient.setQueryData<Todo>(
+        QUERY_KEYS.todo.detail(newTodo.id),
+        newTodo
+      );
+      queryClient.setQueryData<string[]>(
+        QUERY_KEYS.todo.list,
+        (prevTodoIds) => {
+          if (!prevTodoIds) return [newTodo.id];
+          return [...prevTodoIds, newTodo.id];
+        }
+      );
     }, // setQueryData 메서드를 통해 새로운 todoItem 이 추가가 됨, 리패칭 없이 리스트 업데이트
     onError: (error) => {
       window.alert(error.message);

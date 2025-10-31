@@ -9,35 +9,35 @@ export function useUpdateTodoMutation() {
     mutationFn: updateTodo,
     // 낙관적 업데이트
     onMutate: async (updatedTodo) => {
-      // 낙관적 업데이트 진행 중에 데이터 조회 요청이 들어오면 취소
       await queryClient.cancelQueries({
-        queryKey: QUERY_KEYS.todo.list,
+        queryKey: QUERY_KEYS.todo.detail(updatedTodo.id),
       });
 
-      const prevTodos = queryClient.getQueryData<Todo[]>(QUERY_KEYS.todo.list); // 업데이트 이전 todos data
-      // console.log("prevTodos:", prevTodos);
-
-      // 캐시 업데이트 (낙관적 업데이트)
-      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (prevTodos) => {
-        if (!prevTodos) return [];
-        return prevTodos.map((prevTodo) =>
-          prevTodo.id === updatedTodo.id
-            ? { ...prevTodo, ...updatedTodo }
-            : prevTodo
-        );
-      });
-
-      // 이 return 값이 context로 전달
+      const prevTodo = queryClient.getQueryData<Todo>(
+        QUERY_KEYS.todo.detail(updatedTodo.id)
+      );
+      // 낙관적 업데이트 진행 중에 데이터 조회 요청이 들어오면 취소
+      queryClient.setQueryData<Todo>(
+        QUERY_KEYS.todo.detail(updatedTodo.id),
+        (prevTodo) => {
+          if (!prevTodo) return;
+          return {
+            ...prevTodo,
+            ...updatedTodo,
+          };
+        }
+      );
       return {
-        prevTodos,
+        prevTodo,
       };
     },
+
     // 요청 실패시 낙관적 업데이트 취소
     onError: (error, variable, context) => {
-      if (context && context.prevTodos) {
-        queryClient.setQueryData<Todo[]>(
-          QUERY_KEYS.todo.list,
-          context.prevTodos
+      if (context && context.prevTodo) {
+        queryClient.setQueryData<Todo>(
+          QUERY_KEYS.todo.detail(context.prevTodo.id),
+          context.prevTodo
         );
       }
     },
@@ -45,11 +45,12 @@ export function useUpdateTodoMutation() {
     // 요청 성공, 실패 상관없이 마지막에 항상 실행
     // 해당 쿼리 키(todolist)의 캐시 데이터를 무효화(invalidate -> stale 상태로 변경)
     // stale 상태가 된 쿼리는 자동으로 리패칭되어 서버에서 최신 데이터로 갱신됨
-    onSettled: () => {
+
+    /* onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.todo.list,
+        queryKey: QUERY_KEYS.todo.detail(),
       });
-    },
+    }, */
   });
 }
 

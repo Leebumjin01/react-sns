@@ -4,12 +4,11 @@ import { useParams } from "react-router";
 export default function TodoDetailPage() {
   const params = useParams();
   const id = params.id;
-  console.log("id:", id);
 
-  const { data, isLoading, error } = useTodoDataById(String(id));
+  const { data, isLoading, error } = useTodoDataById(String(id), "DETAIL");
 
-  //   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>오류가 발생했습니다...</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error || !data) return <div>오류가 발생했습니다...</div>;
 
-  return isLoading ? <div>Loading...</div> : data && <div>{data.content}</div>;
+  return <div>{data?.content}</div>;
 }

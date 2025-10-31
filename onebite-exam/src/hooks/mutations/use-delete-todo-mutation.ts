@@ -8,21 +8,17 @@ export function useDeleteTodoMutation() {
   return useMutation({
     mutationFn: deleteTodo,
 
-    // 캐시 데이터 업데이트 방법
-    // 1. 캐시 무효화 -> invalidateQueries
-    // 2. 수정 요청의 응답 값 활용 -> onSuccess
-    // 3. 낙관적 업데이트 -> onMutate
-
-    // 2. 수정 요청의 응답 값 활용 -> onSuccess
     onSuccess: (deletedTodo) => {
-      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (prevTodos) => {
-        if (!prevTodos) return [];
-        return prevTodos.filter((prevTodo) => prevTodo.id !== deletedTodo.id);
+      queryClient.removeQueries({
+        queryKey: QUERY_KEYS.todo.detail(deletedTodo.id),
       });
+      queryClient.setQueryData<string[]>(
+        QUERY_KEYS.todo.list,
+        (prevTodoIds) => {
+          if (!prevTodoIds) return [];
+          return prevTodoIds.filter((id) => id !== deletedTodo.id);
+        }
+      );
     },
-
-    onError: (error, variable, context) => {},
-
-    onSettled: () => {},
   });
 }
