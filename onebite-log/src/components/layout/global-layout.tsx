@@ -25,7 +25,7 @@ export default function GlobalLayout() {
         </div>
       </header>
       <main className="m-auto w-full max-w-175 flex-1 border-x px-4 py-6">
-        {/* Outlet -> 페이지 컴포넌트가 실제 렌더링이 될 실제 컴포넌트 */}
+        {/* Outlet -> 전역 레이아웃 내에서 중첩된 자식 라우트의 콘텐츠를 렌더링하는 React Router 컴포넌트 */}
         <Outlet />
       </main>
       <footer className="text-muted-foreground border-t py-10 text-center">
