@@ -27,5 +27,7 @@ export function useInfinitePostsData() {
 
       return allPages.length;
     },
+
+    staleTime: Infinity,
   });
 }
